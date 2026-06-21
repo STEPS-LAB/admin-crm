@@ -1,0 +1,83 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1781869757697,
+      "tag": "0000_lumpy_roulette",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781871249622,
+      "tag": "0001_mixed_magdalene",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781905973349,
+      "tag": "0002_flashy_sage",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781906158959,
+      "tag": "0003_public_phalanx",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781906686434,
+      "tag": "0004_reflective_ma_gnuci",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781907151831,
+      "tag": "0005_elite_random",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781907760850,
+      "tag": "0006_rainy_weapon_omega",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1781909164619,
+      "tag": "0007_spotty_iceman",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1781909806536,
+      "tag": "0008_black_mother_askani",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782034076397,
+      "tag": "0009_soft_juggernaut",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1782036230908,
+      "tag": "0010_square_ser_duncan",
+      "breakpoints": true
+    }
+  ]
+}
