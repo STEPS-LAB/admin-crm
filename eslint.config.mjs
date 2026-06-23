@@ -15,7 +15,7 @@ const eslintConfig = [
       "node_modules/**",
       ".next/**",
       "drizzle/**",
-      "commitlint.config.js",
+      "commitlint.config.mjs",
       "prettier.config.js",
       "next-env.d.ts",
     ],
