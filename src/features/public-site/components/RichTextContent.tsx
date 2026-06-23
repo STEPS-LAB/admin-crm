@@ -1,18 +1,9 @@
-import { sanitizeRichText } from "@/lib/security/sanitizeRichText";
+import { sanitizePublicRichText } from "@/lib/security/sanitizePublicRichText";
 import { cn } from "@/lib/utils/cn";
 
 export interface RichTextContentProps {
   readonly html: string | null;
   readonly className?: string;
-}
-
-function sanitizePublicRichText(html: string): string | null {
-  try {
-    const sanitized = sanitizeRichText(html).trim();
-    return sanitized.length > 0 ? sanitized : null;
-  } catch {
-    return null;
-  }
 }
 
 export function RichTextContent({
@@ -26,11 +17,7 @@ export function RichTextContent({
   const sanitized = sanitizePublicRichText(html);
 
   if (!sanitized) {
-    return (
-      <p className={cn("text-muted-foreground", className)}>
-        {html.replace(/<[^>]+>/g, " ").trim()}
-      </p>
-    );
+    return null;
   }
 
   return (

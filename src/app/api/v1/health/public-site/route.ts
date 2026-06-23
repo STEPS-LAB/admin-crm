@@ -5,14 +5,16 @@ import { findSettings } from "@/repositories/settingsRepository";
 import {
   findPublishedBrandBySlug,
   findPublishedCategoryBySlug,
+  findPublishedCategoryCards,
   findPublishedHomepageContent,
   findPublishedProductBySlug,
   findPublishedProductCards,
   findPublicCatalogStats,
 } from "@/repositories/publicSiteRepository";
 import { findPublishedHomepagePageId } from "@/repositories/publicSeoRepository";
-import { getPublicHomepageSeo } from "@/services/publicSeoService";
-import { loadPublicSiteContext } from "@/services/publicSiteService";
+import { getPublicHomepageSeo, getPublicProductSeo } from "@/services/publicSeoService";
+import { getPublicSitePageData, loadPublicSiteContext } from "@/services/publicSiteService";
+import { getPublicSiteSeoOverview } from "@/services/publicSiteSeoOverviewService";
 
 interface StepResult {
   readonly ok: boolean;
@@ -41,6 +43,7 @@ export async function GET(): Promise<Response> {
     await runStep("findPublishedHomepageContent", () => findPublishedHomepageContent("uk")),
     await runStep("findPublishedHomepagePageId", () => findPublishedHomepagePageId("uk")),
     await runStep("findPublishedProductCards", () => findPublishedProductCards("uk", 4)),
+    await runStep("findPublishedCategoryCards", () => findPublishedCategoryCards("uk", 4)),
     await runStep("findPublishedProductBySlug", () =>
       findPublishedProductBySlug("uk", "demo-produkt"),
     ),
@@ -49,9 +52,18 @@ export async function GET(): Promise<Response> {
     ),
     await runStep("findPublishedBrandBySlug", () => findPublishedBrandBySlug("uk", "demo-brand")),
     await runStep("findPublicCatalogStats", () => findPublicCatalogStats()),
+    await runStep("getPublicSiteSeoOverview", () => getPublicSiteSeoOverview()),
     await runStep("getPublicHomepageSeo", async () => {
       const context = await loadPublicSiteContext("uk");
       await getPublicHomepageSeo(context);
+    }),
+    await runStep("getPublicSitePageData", async () => {
+      const context = await loadPublicSiteContext("uk");
+      await getPublicSitePageData("uk", context.settings);
+    }),
+    await runStep("getPublicProductSeo", async () => {
+      const context = await loadPublicSiteContext("uk");
+      await getPublicProductSeo(context, "demo-produkt");
     }),
   ]) {
     steps[name] = result;
