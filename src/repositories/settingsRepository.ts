@@ -171,19 +171,19 @@ export async function updateSettingsRecord(
   id: string,
   values: Partial<Omit<SettingsRow, "id" | "createdAt">>,
 ): Promise<SettingsRecord | null> {
-  const db = getDb();
+  return withDbRetry(async (db) => {
+    const rows = await db
+      .update(settings)
+      .set({ ...values, updatedAt: new Date() })
+      .where(eq(settings.id, id))
+      .returning();
 
-  const rows = await db
-    .update(settings)
-    .set({ ...values, updatedAt: new Date() })
-    .where(eq(settings.id, id))
-    .returning();
+    const row = rows[0];
 
-  const row = rows[0];
+    if (!row) {
+      return null;
+    }
 
-  if (!row) {
-    return null;
-  }
-
-  return mapSettingsRow(row);
+    return mapSettingsRow(row);
+  });
 }

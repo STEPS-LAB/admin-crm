@@ -40,18 +40,25 @@ function createQueryClient(): ReturnType<typeof postgres> {
   });
 }
 
+function getErrorCode(error: unknown): string | undefined {
+  if (!(error instanceof Error) || !("code" in error)) {
+    return undefined;
+  }
+
+  const { code } = error as Error & { code?: unknown };
+  return typeof code === "string" ? code : undefined;
+}
+
 export function isTransientDbError(error: unknown): boolean {
   if (!(error instanceof Error)) {
     return false;
   }
 
   const candidates = [error, error.cause];
-  return candidates.some(
-    (candidate) =>
-      candidate instanceof Error &&
-      typeof candidate.code === "string" &&
-      TRANSIENT_DB_ERROR_CODES.has(candidate.code),
-  );
+  return candidates.some((candidate) => {
+    const code = getErrorCode(candidate);
+    return code !== undefined && TRANSIENT_DB_ERROR_CODES.has(code);
+  });
 }
 
 export function resetDbPool(): void {
