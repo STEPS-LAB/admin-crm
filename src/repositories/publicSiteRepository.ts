@@ -1,6 +1,6 @@
 import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
 
-import { getDb } from "@/db/client";
+import { getDb, withDbRetry } from "@/db/client";
 import {
   brandTranslations,
   brands,
@@ -60,11 +60,15 @@ function publishedPageConditions(language: PublicSiteLanguage) {
   );
 }
 
-function mapSeoMetadata(row: {
-  metaTitle: string | null;
-  metaDescription: string | null;
-  overallScore: number | null;
-} | undefined): PublicSiteSeoMetadata | null {
+function mapSeoMetadata(
+  row:
+    | {
+        metaTitle: string | null;
+        metaDescription: string | null;
+        overallScore: number | null;
+      }
+    | undefined,
+): PublicSiteSeoMetadata | null {
   if (!row) {
     return null;
   }
@@ -178,7 +182,10 @@ export async function findPublishedProductCards(
     .from(products)
     .innerJoin(
       productTranslations,
-      and(eq(productTranslations.productId, products.id), eq(productTranslations.language, language)),
+      and(
+        eq(productTranslations.productId, products.id),
+        eq(productTranslations.language, language),
+      ),
     )
     .leftJoin(categories, eq(products.categoryId, categories.id))
     .leftJoin(
@@ -258,7 +265,10 @@ export async function findPublishedProductCardsPage(
     .from(products)
     .innerJoin(
       productTranslations,
-      and(eq(productTranslations.productId, products.id), eq(productTranslations.language, language)),
+      and(
+        eq(productTranslations.productId, products.id),
+        eq(productTranslations.language, language),
+      ),
     )
     .leftJoin(categories, eq(products.categoryId, categories.id))
     .leftJoin(
@@ -470,94 +480,97 @@ export async function findPublishedProductBySlug(
   language: PublicSiteLanguage,
   slug: string,
 ): Promise<PublicSiteProductDetail | null> {
-  const db = getDb();
+  return withDbRetry(async (db) => {
+    const [row] = await db
+      .select({
+        id: products.id,
+        sku: products.sku,
+        name: productTranslations.name,
+        slug: productTranslations.slug,
+        shortDescription: productTranslations.shortDescription,
+        description: productTranslations.description,
+        price: products.price,
+        oldPrice: products.oldPrice,
+        currency: products.currency,
+        stockStatus: products.stockStatus,
+        categoryName: categoryTranslations.name,
+        categorySlug: categoryTranslations.slug,
+        brandName: brandTranslations.name,
+        brandSlug: brands.slug,
+        seoScore: seoAnalysis.overallScore,
+        metaTitle: metadata.metaTitle,
+        metaDescription: metadata.metaDescription,
+        coverStorageBucket: mediaAssets.storageBucket,
+        coverStoragePath: mediaAssets.storagePath,
+        coverAltUk: mediaAssets.altUk,
+        coverAltEn: mediaAssets.altEn,
+        coverAssetDeleted: mediaAssets.isDeleted,
+      })
+      .from(products)
+      .innerJoin(
+        productTranslations,
+        and(
+          eq(productTranslations.productId, products.id),
+          eq(productTranslations.language, language),
+        ),
+      )
+      .leftJoin(categories, eq(products.categoryId, categories.id))
+      .leftJoin(
+        categoryTranslations,
+        and(
+          eq(categoryTranslations.categoryId, categories.id),
+          eq(categoryTranslations.language, language),
+        ),
+      )
+      .leftJoin(brands, eq(products.brandId, brands.id))
+      .leftJoin(
+        brandTranslations,
+        and(eq(brandTranslations.brandId, brands.id), eq(brandTranslations.language, language)),
+      )
+      .leftJoin(
+        seoProfiles,
+        and(
+          eq(seoProfiles.ownerId, products.id),
+          eq(seoProfiles.ownerType, "product"),
+          eq(seoProfiles.language, language),
+          isNull(seoProfiles.deletedAt),
+        ),
+      )
+      .leftJoin(metadata, eq(metadata.seoProfileId, seoProfiles.id))
+      .leftJoin(seoAnalysis, eq(seoAnalysis.seoProfileId, seoProfiles.id))
+      .leftJoin(
+        mediaUsage,
+        and(
+          eq(mediaUsage.ownerId, products.id),
+          eq(mediaUsage.ownerType, "product"),
+          eq(mediaUsage.usageType, "cover"),
+        ),
+      )
+      .leftJoin(mediaAssets, eq(mediaUsage.mediaAssetId, mediaAssets.id))
+      .where(and(publishedProductConditions(language), eq(productTranslations.slug, slug)))
+      .limit(1);
 
-  const [row] = await db
-    .select({
-      id: products.id,
-      sku: products.sku,
-      name: productTranslations.name,
-      slug: productTranslations.slug,
-      shortDescription: productTranslations.shortDescription,
-      description: productTranslations.description,
-      price: products.price,
-      oldPrice: products.oldPrice,
-      currency: products.currency,
-      stockStatus: products.stockStatus,
-      categoryName: categoryTranslations.name,
-      categorySlug: categoryTranslations.slug,
-      brandName: brandTranslations.name,
-      brandSlug: brands.slug,
-      seoScore: seoAnalysis.overallScore,
-      metaTitle: metadata.metaTitle,
-      metaDescription: metadata.metaDescription,
-      coverStorageBucket: mediaAssets.storageBucket,
-      coverStoragePath: mediaAssets.storagePath,
-      coverAltUk: mediaAssets.altUk,
-      coverAltEn: mediaAssets.altEn,
-      coverAssetDeleted: mediaAssets.isDeleted,
-    })
-    .from(products)
-    .innerJoin(
-      productTranslations,
-      and(eq(productTranslations.productId, products.id), eq(productTranslations.language, language)),
-    )
-    .leftJoin(categories, eq(products.categoryId, categories.id))
-    .leftJoin(
-      categoryTranslations,
-      and(
-        eq(categoryTranslations.categoryId, categories.id),
-        eq(categoryTranslations.language, language),
-      ),
-    )
-    .leftJoin(brands, eq(products.brandId, brands.id))
-    .leftJoin(
-      brandTranslations,
-      and(eq(brandTranslations.brandId, brands.id), eq(brandTranslations.language, language)),
-    )
-    .leftJoin(
-      seoProfiles,
-      and(
-        eq(seoProfiles.ownerId, products.id),
-        eq(seoProfiles.ownerType, "product"),
-        eq(seoProfiles.language, language),
-        isNull(seoProfiles.deletedAt),
-      ),
-    )
-    .leftJoin(metadata, eq(metadata.seoProfileId, seoProfiles.id))
-    .leftJoin(seoAnalysis, eq(seoAnalysis.seoProfileId, seoProfiles.id))
-    .leftJoin(
-      mediaUsage,
-      and(
-        eq(mediaUsage.ownerId, products.id),
-        eq(mediaUsage.ownerType, "product"),
-        eq(mediaUsage.usageType, "cover"),
-      ),
-    )
-    .leftJoin(mediaAssets, eq(mediaUsage.mediaAssetId, mediaAssets.id))
-    .where(and(publishedProductConditions(language), eq(productTranslations.slug, slug)))
-    .limit(1);
+    if (!row) {
+      return null;
+    }
 
-  if (!row) {
-    return null;
-  }
+    const card = mapProductCard(row, language);
 
-  const card = mapProductCard(row, language);
-
-  return {
-    ...card,
-    description: row.description,
-    oldPrice: row.oldPrice,
-    stockStatus: row.stockStatus,
-    sku: row.sku,
-    categorySlug: row.categorySlug,
-    brandSlug: row.brandSlug,
-    seo: mapSeoMetadata({
-      metaTitle: row.metaTitle,
-      metaDescription: row.metaDescription,
-      overallScore: row.seoScore,
-    }),
-  };
+    return {
+      ...card,
+      description: row.description,
+      oldPrice: row.oldPrice,
+      stockStatus: row.stockStatus,
+      sku: row.sku,
+      categorySlug: row.categorySlug,
+      brandSlug: row.brandSlug,
+      seo: mapSeoMetadata({
+        metaTitle: row.metaTitle,
+        metaDescription: row.metaDescription,
+        overallScore: row.seoScore,
+      }),
+    };
+  });
 }
 
 export async function findPublishedProductsForCategory(
@@ -587,7 +600,10 @@ export async function findPublishedProductsForCategory(
     .from(products)
     .innerJoin(
       productTranslations,
-      and(eq(productTranslations.productId, products.id), eq(productTranslations.language, language)),
+      and(
+        eq(productTranslations.productId, products.id),
+        eq(productTranslations.language, language),
+      ),
     )
     .leftJoin(categories, eq(products.categoryId, categories.id))
     .leftJoin(
@@ -770,78 +786,78 @@ export async function findPublishedBrandBySlug(
   language: PublicSiteLanguage,
   slug: string,
 ): Promise<PublicSiteBrandDetail | null> {
-  const db = getDb();
+  return withDbRetry(async (db) => {
+    const [row] = await db
+      .select({
+        id: brands.id,
+        slug: brands.slug,
+        name: brandTranslations.name,
+        description: brandTranslations.description,
+        website: brands.website,
+        country: brands.country,
+        seoScore: seoAnalysis.overallScore,
+        metaTitle: metadata.metaTitle,
+        metaDescription: metadata.metaDescription,
+        coverStorageBucket: mediaAssets.storageBucket,
+        coverStoragePath: mediaAssets.storagePath,
+        coverAltUk: mediaAssets.altUk,
+        coverAltEn: mediaAssets.altEn,
+        coverAssetDeleted: mediaAssets.isDeleted,
+      })
+      .from(brands)
+      .innerJoin(
+        brandTranslations,
+        and(eq(brandTranslations.brandId, brands.id), eq(brandTranslations.language, language)),
+      )
+      .leftJoin(
+        seoProfiles,
+        and(
+          eq(seoProfiles.ownerId, brands.id),
+          eq(seoProfiles.ownerType, "brand"),
+          eq(seoProfiles.language, language),
+          isNull(seoProfiles.deletedAt),
+        ),
+      )
+      .leftJoin(metadata, eq(metadata.seoProfileId, seoProfiles.id))
+      .leftJoin(seoAnalysis, eq(seoAnalysis.seoProfileId, seoProfiles.id))
+      .leftJoin(
+        mediaUsage,
+        and(
+          eq(mediaUsage.ownerId, brands.id),
+          eq(mediaUsage.ownerType, "brand"),
+          eq(mediaUsage.usageType, "cover"),
+        ),
+      )
+      .leftJoin(mediaAssets, eq(mediaUsage.mediaAssetId, mediaAssets.id))
+      .where(and(publishedBrandConditions(language), eq(brands.slug, slug)))
+      .limit(1);
 
-  const [row] = await db
-    .select({
-      id: brands.id,
-      slug: brands.slug,
-      name: brandTranslations.name,
-      description: brandTranslations.description,
-      website: brands.website,
-      country: brands.country,
-      seoScore: seoAnalysis.overallScore,
-      metaTitle: metadata.metaTitle,
-      metaDescription: metadata.metaDescription,
-      coverStorageBucket: mediaAssets.storageBucket,
-      coverStoragePath: mediaAssets.storagePath,
-      coverAltUk: mediaAssets.altUk,
-      coverAltEn: mediaAssets.altEn,
-      coverAssetDeleted: mediaAssets.isDeleted,
-    })
-    .from(brands)
-    .innerJoin(
-      brandTranslations,
-      and(eq(brandTranslations.brandId, brands.id), eq(brandTranslations.language, language)),
-    )
-    .leftJoin(
-      seoProfiles,
-      and(
-        eq(seoProfiles.ownerId, brands.id),
-        eq(seoProfiles.ownerType, "brand"),
-        eq(seoProfiles.language, language),
-        isNull(seoProfiles.deletedAt),
-      ),
-    )
-    .leftJoin(metadata, eq(metadata.seoProfileId, seoProfiles.id))
-    .leftJoin(seoAnalysis, eq(seoAnalysis.seoProfileId, seoProfiles.id))
-    .leftJoin(
-      mediaUsage,
-      and(
-        eq(mediaUsage.ownerId, brands.id),
-        eq(mediaUsage.ownerType, "brand"),
-        eq(mediaUsage.usageType, "cover"),
-      ),
-    )
-    .leftJoin(mediaAssets, eq(mediaUsage.mediaAssetId, mediaAssets.id))
-    .where(and(publishedBrandConditions(language), eq(brands.slug, slug)))
-    .limit(1);
+    if (!row) {
+      return null;
+    }
 
-  if (!row) {
-    return null;
-  }
+    const hasCover =
+      row.coverStorageBucket && row.coverStoragePath && row.coverAssetDeleted === false;
 
-  const hasCover =
-    row.coverStorageBucket && row.coverStoragePath && row.coverAssetDeleted === false;
-
-  return {
-    id: row.id,
-    name: row.name ?? "Untitled brand",
-    slug: row.slug,
-    description: row.description,
-    website: row.website,
-    country: row.country,
-    coverThumbnailUrl:
-      hasCover && row.coverStorageBucket && row.coverStoragePath
-        ? buildMediaPublicUrl(row.coverStorageBucket, row.coverStoragePath)
-        : null,
-    coverAlt: (language === "uk" ? row.coverAltUk : row.coverAltEn) ?? row.name ?? null,
-    seo: mapSeoMetadata({
-      metaTitle: row.metaTitle,
-      metaDescription: row.metaDescription,
-      overallScore: row.seoScore,
-    }),
-  };
+    return {
+      id: row.id,
+      name: row.name ?? "Untitled brand",
+      slug: row.slug,
+      description: row.description,
+      website: row.website,
+      country: row.country,
+      coverThumbnailUrl:
+        hasCover && row.coverStorageBucket && row.coverStoragePath
+          ? buildMediaPublicUrl(row.coverStorageBucket, row.coverStoragePath)
+          : null,
+      coverAlt: (language === "uk" ? row.coverAltUk : row.coverAltEn) ?? row.name ?? null,
+      seo: mapSeoMetadata({
+        metaTitle: row.metaTitle,
+        metaDescription: row.metaDescription,
+        overallScore: row.seoScore,
+      }),
+    };
+  });
 }
 
 export async function findPublicCatalogStats(): Promise<PublicSiteCatalogStats> {

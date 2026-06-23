@@ -24,7 +24,7 @@ import {
   findPublishedProductCards,
   findPublishedProductsForCategory,
 } from "@/repositories/publicSiteRepository";
-import { getOverview } from "@/services/seoCenterService";
+import { getPublicSiteSeoOverview } from "@/services/publicSiteSeoOverviewService";
 import { getSettings } from "@/services/settingsService";
 
 import type {
@@ -60,11 +60,11 @@ export async function getPublicSitePageData(
   language: PublicSiteLanguage,
   settings: SettingsRecord,
 ): Promise<PublicSitePageData> {
-  const [homepage, products, categories, seoOverview, catalogStats] = await Promise.all([
-    findPublishedHomepageContent(language),
-    findPublishedProductCards(language, PUBLIC_SITE_PRODUCT_LIMIT),
-    findPublishedCategoryCards(language, PUBLIC_SITE_CATEGORY_LIMIT),
-    getOverview(),
+  const homepage = await findPublishedHomepageContent(language);
+  const products = await findPublishedProductCards(language, PUBLIC_SITE_PRODUCT_LIMIT);
+  const categories = await findPublishedCategoryCards(language, PUBLIC_SITE_CATEGORY_LIMIT);
+  const [seoOverview, catalogStats] = await Promise.all([
+    getPublicSiteSeoOverview(),
     findPublicCatalogStats(),
   ]);
 
