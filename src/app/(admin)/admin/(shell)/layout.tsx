@@ -7,6 +7,8 @@ import { AUTH_ROUTES } from "@/constants/auth";
 import { resolveDeveloperDiagnostics } from "@/lib/system/developerMode";
 import { enforceAdminSecurityGate } from "@/services/adminSecurityService";
 
+export const dynamic = "force-dynamic";
+
 export default async function AuthenticatedAdminLayout({
   children,
 }: Readonly<{

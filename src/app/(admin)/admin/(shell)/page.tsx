@@ -11,6 +11,8 @@ import { SeoHealthHero } from "@/features/dashboard/components/SeoHealthHero";
 import { SeoHealthMetrics } from "@/features/dashboard/components/SeoHealthMetrics";
 import { SeoIssuesSummary } from "@/features/dashboard/components/SeoIssuesSummary";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Dashboard",
 };
