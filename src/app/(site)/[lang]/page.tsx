@@ -12,9 +12,7 @@ import {
   PublicSiteShell,
   loadPublicSitePageContext,
 } from "@/features/public-site/components/PublicSiteShell";
-import {
-  getCachedPublicHomepageSeo,
-} from "@/lib/public-site/cachedPublicSeo";
+import { getCachedPublicHomepageSeo } from "@/lib/public-site/cachedPublicSeo";
 import { getPublicSitePageData } from "@/services/publicSiteService";
 import { buildMaintenanceMetadata } from "@/services/publicSeoService";
 
@@ -24,9 +22,7 @@ interface PublicSiteHomePageProps {
   readonly params: Promise<{ lang: string }>;
 }
 
-export async function generateMetadata({
-  params,
-}: PublicSiteHomePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PublicSiteHomePageProps): Promise<Metadata> {
   const { lang } = await params;
   const pageState = await loadPublicSitePageContext(lang);
 
@@ -52,7 +48,7 @@ export default async function PublicSiteHomePage({
   }
 
   const [data, seo] = await Promise.all([
-    getPublicSitePageData(pageState.context.language),
+    getPublicSitePageData(pageState.context.language, pageState.context.settings),
     getCachedPublicHomepageSeo(pageState.context),
   ]);
 

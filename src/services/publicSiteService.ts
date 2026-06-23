@@ -38,6 +38,7 @@ import type {
   PublicSiteProductDetail,
   PublicSiteSearchResults,
 } from "@/types/public-site";
+import type { SettingsRecord } from "@/types/settings";
 
 export { resolvePublicSiteLanguage } from "@/lib/public-site/language";
 
@@ -55,9 +56,11 @@ export async function loadPublicSiteContext(
   };
 }
 
-export async function getPublicSitePageData(language: PublicSiteLanguage): Promise<PublicSitePageData> {
-  const [settings, homepage, products, categories, seoOverview, catalogStats] = await Promise.all([
-    getSettings(),
+export async function getPublicSitePageData(
+  language: PublicSiteLanguage,
+  settings: SettingsRecord,
+): Promise<PublicSitePageData> {
+  const [homepage, products, categories, seoOverview, catalogStats] = await Promise.all([
     findPublishedHomepageContent(language),
     findPublishedProductCards(language, PUBLIC_SITE_PRODUCT_LIMIT),
     findPublishedCategoryCards(language, PUBLIC_SITE_CATEGORY_LIMIT),

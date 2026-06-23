@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 
-import { getDb } from "@/db/client";
+import { withDbRetry } from "@/db/client";
 import { settings } from "@/db/schema/settings";
 
 import type { SettingsRecord } from "@/types/settings";
@@ -132,37 +132,39 @@ function mapSettingsRow(row: SettingsRow): SettingsRecord {
 }
 
 export async function findSettings(): Promise<SettingsRecord | null> {
-  const db = getDb();
-  const rows = await db.select().from(settings).limit(1);
+  return withDbRetry(async (db) => {
+    const rows = await db.select().from(settings).limit(1);
 
-  const row = rows[0];
+    const row = rows[0];
 
-  if (!row) {
-    return null;
-  }
+    if (!row) {
+      return null;
+    }
 
-  return mapSettingsRow(row);
+    return mapSettingsRow(row);
+  });
 }
 
 export async function findIpAccessPolicy(): Promise<{
   readonly allowList: readonly string[];
   readonly blockList: readonly string[];
 }> {
-  const db = getDb();
-  const rows = await db
-    .select({
-      ipAllowList: settings.ipAllowList,
-      ipBlockList: settings.ipBlockList,
-    })
-    .from(settings)
-    .limit(1);
+  return withDbRetry(async (db) => {
+    const rows = await db
+      .select({
+        ipAllowList: settings.ipAllowList,
+        ipBlockList: settings.ipBlockList,
+      })
+      .from(settings)
+      .limit(1);
 
-  const row = rows[0];
+    const row = rows[0];
 
-  return {
-    allowList: row?.ipAllowList ?? [],
-    blockList: row?.ipBlockList ?? [],
-  };
+    return {
+      allowList: row?.ipAllowList ?? [],
+      blockList: row?.ipBlockList ?? [],
+    };
+  });
 }
 
 export async function updateSettingsRecord(

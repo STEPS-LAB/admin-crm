@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 
 import { MaintenanceNotice } from "@/features/public-site/components/MaintenanceNotice";
 import { SiteFooter } from "@/features/public-site/components/SiteFooter";
@@ -20,7 +20,7 @@ export function PublicSiteShell({
 }: PublicSiteShellProps): React.JSX.Element {
   return (
     <>
-      <Suspense fallback={<div className="h-16 border-b bg-muted/30" />}>
+      <Suspense fallback={<div className="bg-muted/30 h-16 border-b" />}>
         <SiteHeader
           siteName={context.settings.siteName}
           language={context.language}
@@ -34,7 +34,7 @@ export function PublicSiteShell({
   );
 }
 
-export async function loadPublicSitePageContext(
+export const loadPublicSitePageContext = cache(async function loadPublicSitePageContext(
   langParam: string | undefined,
 ): Promise<{ readonly maintenance: boolean; readonly context: PublicSiteContext }> {
   const context = await loadPublicSiteContext(langParam);
@@ -43,7 +43,7 @@ export async function loadPublicSitePageContext(
     maintenance: context.settings.maintenanceMode,
     context,
   };
-}
+});
 
 export interface PublicSiteMaintenanceProps {
   readonly context: PublicSiteContext;
