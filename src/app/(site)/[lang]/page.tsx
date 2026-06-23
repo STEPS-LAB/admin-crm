@@ -63,20 +63,27 @@ export default async function PublicSiteHomePage({
           homepage={data.homepage}
           publishedProducts={data.catalogStats.publishedProducts}
           publishedCategories={data.catalogStats.publishedCategories}
+          language={data.language}
         />
         <SiteProductsSection products={data.products} language={data.language} />
         <SiteCategoriesSection categories={data.categories} language={data.language} />
-        <SiteSeoSection overview={data.seoOverview} catalogStats={data.catalogStats} />
+        <SiteSeoSection
+          overview={data.seoOverview}
+          catalogStats={data.catalogStats}
+          language={data.language}
+        />
         <SiteAboutSection
           siteName={data.settings.siteName}
           siteDescription={data.settings.siteDescription}
           homepage={data.homepage}
+          language={data.language}
         />
         <SiteContactSection
           siteName={data.settings.siteName}
           siteUrl={data.settings.siteUrl}
           timezone={data.settings.timezone}
           currency={data.settings.currency}
+          language={data.language}
         />
       </PublicSiteShell>
     </>

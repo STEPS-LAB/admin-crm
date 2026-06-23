@@ -7,9 +7,12 @@ export function resolvePublicSiteLanguage(
   supportedLanguages: readonly PublicSiteLanguage[],
   fallbackLanguage?: PublicSiteLanguage,
 ): PublicSiteLanguage {
-  if (requested === "uk" || requested === "en") {
-    if (supportedLanguages.includes(requested)) {
-      return requested;
+  const normalized =
+    requested === "ua" ? "uk" : requested === "uk" || requested === "en" ? requested : undefined;
+
+  if (normalized) {
+    if (supportedLanguages.includes(normalized)) {
+      return normalized;
     }
 
     if (fallbackLanguage && supportedLanguages.includes(fallbackLanguage)) {
@@ -20,9 +23,7 @@ export function resolvePublicSiteLanguage(
   return supportedLanguages.includes(defaultLanguage) ? defaultLanguage : "uk";
 }
 
-export function getSupportedPublicLanguages(
-  settings: SettingsRecord,
-): PublicSiteLanguage[] {
+export function getSupportedPublicLanguages(settings: SettingsRecord): PublicSiteLanguage[] {
   const supported = settings.supportedLanguages.filter(
     (language): language is PublicSiteLanguage => language === "uk" || language === "en",
   );

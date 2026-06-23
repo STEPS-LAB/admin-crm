@@ -7,6 +7,7 @@ import { SiteBreadcrumbs } from "@/features/public-site/components/SiteBreadcrum
 import { getSeoScoreColor } from "@/features/dashboard/utils/seoScore";
 import { buildCategoryBreadcrumbTrail } from "@/lib/public-site/breadcrumbTrails";
 import { formatPublicPrice } from "@/lib/public-site/formatPrice";
+import { formatProductCount, getPublicSiteMessage } from "@/lib/public-site/messages";
 import { buildPublicSiteEntityHref } from "@/lib/public-site/paths";
 import { cn } from "@/lib/utils/cn";
 
@@ -31,11 +32,14 @@ export function CategoryDetailView({
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
-      <SiteBreadcrumbs language={language} items={buildCategoryBreadcrumbTrail(category, language)} />
+      <SiteBreadcrumbs
+        language={language}
+        items={buildCategoryBreadcrumbTrail(category, language)}
+      />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
         <div className="space-y-4">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-xl border bg-muted">
+          <div className="bg-muted relative aspect-[4/3] overflow-hidden rounded-xl border">
             {category.coverThumbnailUrl ? (
               <Image
                 src={category.coverThumbnailUrl}
@@ -45,20 +49,18 @@ export function CategoryDetailView({
                 sizes="320px"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                No cover image
+              <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+                {getPublicSiteMessage(language, "common.noCoverImage")}
               </div>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
             {category.seoScore !== null && scoreColors ? (
               <Badge variant="outline" className={cn(scoreColors.text)}>
-                SEO {category.seoScore}
+                {getPublicSiteMessage(language, "common.seo")} {category.seoScore}
               </Badge>
             ) : null}
-            <Badge variant="secondary">
-              {category.productCount} product{category.productCount === 1 ? "" : "s"}
-            </Badge>
+            <Badge variant="secondary">{formatProductCount(language, category.productCount)}</Badge>
           </div>
         </div>
 
@@ -66,14 +68,14 @@ export function CategoryDetailView({
           <div>
             <h1 className="text-4xl font-semibold tracking-tight">{category.name}</h1>
             {category.description ? (
-              <p className="mt-4 text-lg text-muted-foreground">{category.description}</p>
+              <p className="text-muted-foreground mt-4 text-lg">{category.description}</p>
             ) : null}
           </div>
 
           {products.length === 0 ? (
             <Card>
-              <CardContent className="py-10 text-center text-sm text-muted-foreground">
-                No published products in this category yet.
+              <CardContent className="text-muted-foreground py-10 text-center text-sm">
+                {getPublicSiteMessage(language, "category.noProducts")}
               </CardContent>
             </Card>
           ) : (
@@ -84,12 +86,12 @@ export function CategoryDetailView({
                   href={buildPublicSiteEntityHref("products", product.slug, language)}
                   className="block"
                 >
-                  <Card className="h-full transition-colors hover:bg-accent/30">
+                  <Card className="hover:bg-accent/30 h-full transition-colors">
                     <CardHeader>
                       <CardTitle className="line-clamp-2 text-base">{product.name}</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2 text-sm text-muted-foreground">
-                      <p className="font-medium text-foreground">
+                    <CardContent className="text-muted-foreground space-y-2 text-sm">
+                      <p className="text-foreground font-medium">
                         {formatPublicPrice(product.price, product.currency)}
                       </p>
                       {product.shortDescription ? (

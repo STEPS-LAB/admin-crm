@@ -5,11 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  PUBLIC_SITE_LANGUAGE_LABELS,
-  PUBLIC_SITE_SECTIONS,
-} from "@/constants/public-site";
+import { PUBLIC_SITE_LANGUAGE_LABELS } from "@/constants/public-site";
 import { SiteSearchForm } from "@/features/public-site/components/SiteSearchForm";
+import { getPublicSiteMessage, getPublicSiteSections } from "@/lib/public-site/messages";
 import { replaceLanguageInPathname } from "@/lib/public-site/pathLanguage";
 import { buildPublicSiteHomeHref } from "@/lib/public-site/paths";
 import { cn } from "@/lib/utils/cn";
@@ -32,6 +30,7 @@ export function SiteHeader({
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const sections = getPublicSiteSections(language);
 
   const switchLanguage = (nextLanguage: PublicSiteLanguage): void => {
     const nextPath = replaceLanguageInPathname(pathname, nextLanguage);
@@ -42,7 +41,7 @@ export function SiteHeader({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="border-border/60 bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 md:px-6">
         <Link
           href={`${buildPublicSiteHomeHref(language)}#hero`}
@@ -51,12 +50,15 @@ export function SiteHeader({
           {siteName}
         </Link>
 
-        <nav className="hidden flex-1 items-center justify-center gap-1 md:flex" aria-label="Page sections">
-          {PUBLIC_SITE_SECTIONS.map((section) => (
+        <nav
+          className="hidden flex-1 items-center justify-center gap-1 md:flex"
+          aria-label={getPublicSiteMessage(language, "header.sections")}
+        >
+          {sections.map((section) => (
             <a
               key={section.id}
               href={`#${section.id}`}
-              className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="text-muted-foreground hover:bg-accent hover:text-foreground rounded-md px-3 py-2 text-sm transition-colors"
             >
               {section.label}
             </a>
@@ -69,7 +71,11 @@ export function SiteHeader({
 
         <div className="ml-auto flex items-center gap-2">
           {languageSwitcherEnabled && supportedLanguages.length > 1 ? (
-            <div className="flex rounded-md border p-0.5" role="group" aria-label="Language">
+            <div
+              className="flex rounded-md border p-0.5"
+              role="group"
+              aria-label={getPublicSiteMessage(language, "header.language")}
+            >
               {supportedLanguages.map((supportedLanguage) => (
                 <button
                   key={supportedLanguage}
@@ -91,7 +97,7 @@ export function SiteHeader({
           ) : null}
 
           <Button variant="outline" size="sm" asChild>
-            <Link href="/admin">Admin</Link>
+            <Link href="/admin">{getPublicSiteMessage(language, "common.admin")}</Link>
           </Button>
         </div>
       </div>

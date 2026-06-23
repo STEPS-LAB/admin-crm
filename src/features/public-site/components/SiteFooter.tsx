@@ -1,34 +1,47 @@
 import Link from "next/link";
 
-import { PUBLIC_SITE_SECTIONS } from "@/constants/public-site";
+import {
+  getPublicSiteLocale,
+  getPublicSiteMessage,
+  getPublicSiteSections,
+} from "@/lib/public-site/messages";
+
+import type { PublicSiteLanguage } from "@/types/public-site";
 
 export interface SiteFooterProps {
   readonly siteName: string;
   readonly generatedAt: Date;
+  readonly language: PublicSiteLanguage;
 }
 
-export function SiteFooter({ siteName, generatedAt }: SiteFooterProps): React.JSX.Element {
+export function SiteFooter({
+  siteName,
+  generatedAt,
+  language,
+}: SiteFooterProps): React.JSX.Element {
+  const formattedDate = generatedAt.toLocaleString(getPublicSiteLocale(language));
+
   return (
-    <footer className="border-t bg-muted/30">
+    <footer className="bg-muted/30 border-t">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-6">
         <div>
           <p className="font-medium">{siteName}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Generated {generatedAt.toLocaleString("uk-UA")} from live CMS data.
+          <p className="text-muted-foreground mt-1 text-sm">
+            {getPublicSiteMessage(language, "footer.generated", { date: formattedDate })}
           </p>
         </div>
 
-        <nav className="flex flex-wrap gap-4 text-sm text-muted-foreground" aria-label="Footer">
-          {PUBLIC_SITE_SECTIONS.map((section) => (
+        <nav className="text-muted-foreground flex flex-wrap gap-4 text-sm" aria-label="Footer">
+          {getPublicSiteSections(language).map((section) => (
             <a key={section.id} href={`#${section.id}`} className="hover:text-foreground">
               {section.label}
             </a>
           ))}
           <Link href="/" className="hover:text-foreground">
-            Platform home
+            {getPublicSiteMessage(language, "common.platformHome")}
           </Link>
           <Link href="/admin" className="hover:text-foreground">
-            Admin
+            {getPublicSiteMessage(language, "common.admin")}
           </Link>
         </nav>
       </div>

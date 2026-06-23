@@ -29,7 +29,11 @@ export function PublicSiteShell({
         />
       </Suspense>
       {children}
-      <SiteFooter siteName={context.settings.siteName} generatedAt={generatedAt} />
+      <SiteFooter
+        siteName={context.settings.siteName}
+        generatedAt={generatedAt}
+        language={context.language}
+      />
     </>
   );
 }

@@ -8,6 +8,7 @@ import { SiteBreadcrumbs } from "@/features/public-site/components/SiteBreadcrum
 import { RichTextContent } from "@/features/public-site/components/RichTextContent";
 import { getSeoScoreColor } from "@/features/dashboard/utils/seoScore";
 import { buildBrandBreadcrumbTrail } from "@/lib/public-site/breadcrumbTrails";
+import { getPublicSiteMessage } from "@/lib/public-site/messages";
 import { buildPublicSiteHomeHref } from "@/lib/public-site/paths";
 import { cn } from "@/lib/utils/cn";
 
@@ -30,7 +31,7 @@ export function BrandDetailView({ brand, language }: BrandDetailViewProps): Reac
 
       <div className="mt-8 space-y-8">
         <div className="grid gap-6 md:grid-cols-[200px_minmax(0,1fr)] md:items-start">
-          <div className="relative mx-auto aspect-square w-full max-w-[200px] overflow-hidden rounded-xl border bg-muted">
+          <div className="bg-muted relative mx-auto aspect-square w-full max-w-[200px] overflow-hidden rounded-xl border">
             {brand.coverThumbnailUrl ? (
               <Image
                 src={brand.coverThumbnailUrl}
@@ -40,8 +41,8 @@ export function BrandDetailView({ brand, language }: BrandDetailViewProps): Reac
                 sizes="200px"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                No logo
+              <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+                {getPublicSiteMessage(language, "common.noLogo")}
               </div>
             )}
           </div>
@@ -52,7 +53,7 @@ export function BrandDetailView({ brand, language }: BrandDetailViewProps): Reac
               brand.seo?.overallScore !== undefined &&
               scoreColors ? (
                 <Badge variant="outline" className={cn(scoreColors.text)}>
-                  SEO {brand.seo.overallScore}
+                  {getPublicSiteMessage(language, "common.seo")} {brand.seo.overallScore}
                 </Badge>
               ) : null}
               {brand.country ? <Badge variant="secondary">{brand.country}</Badge> : null}
@@ -63,7 +64,7 @@ export function BrandDetailView({ brand, language }: BrandDetailViewProps): Reac
                 href={brand.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                className="text-primary inline-flex items-center gap-2 text-sm hover:underline"
               >
                 {brand.website}
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -82,7 +83,7 @@ export function BrandDetailView({ brand, language }: BrandDetailViewProps): Reac
 
         <div className="text-sm">
           <Link href={buildPublicSiteHomeHref(language)} className="text-primary hover:underline">
-            Back to storefront
+            {getPublicSiteMessage(language, "common.backToStorefront")}
           </Link>
         </div>
       </div>

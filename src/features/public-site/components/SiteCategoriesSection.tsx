@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSeoScoreColor } from "@/features/dashboard/utils/seoScore";
+import { formatProductCount, getPublicSiteMessage } from "@/lib/public-site/messages";
 import { buildPublicSiteEntityHref } from "@/lib/public-site/paths";
 import { cn } from "@/lib/utils/cn";
 
@@ -19,20 +20,24 @@ export function SiteCategoriesSection({
   language,
 }: SiteCategoriesSectionProps): React.JSX.Element {
   return (
-    <section id="categories" className="scroll-mt-24 border-t bg-muted/20 py-16 md:py-20">
+    <section id="categories" className="bg-muted/20 scroll-mt-24 border-t py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="mb-8">
-          <p className="text-sm font-medium text-primary">Navigation</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight">Shop by category</h2>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Published categories with live product counts and SEO health indicators.
+          <p className="text-primary text-sm font-medium">
+            {getPublicSiteMessage(language, "categories.eyebrow")}
+          </p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+            {getPublicSiteMessage(language, "categories.title")}
+          </h2>
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            {getPublicSiteMessage(language, "categories.description")}
           </p>
         </div>
 
         {categories.length === 0 ? (
           <Card>
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
-              No published categories yet. Publish categories in the admin to populate this section.
+            <CardContent className="text-muted-foreground py-10 text-center text-sm">
+              {getPublicSiteMessage(language, "categories.empty")}
             </CardContent>
           </Card>
         ) : (
@@ -47,8 +52,8 @@ export function SiteCategoriesSection({
                   href={buildPublicSiteEntityHref("categories", category.slug, language)}
                   className="block"
                 >
-                  <Card className="h-full overflow-hidden transition-colors hover:bg-accent/20">
-                    <div className="relative aspect-[16/10] bg-muted">
+                  <Card className="hover:bg-accent/20 h-full overflow-hidden transition-colors">
+                    <div className="bg-muted relative aspect-[16/10]">
                       {category.coverThumbnailUrl ? (
                         <Image
                           src={category.coverThumbnailUrl}
@@ -58,8 +63,8 @@ export function SiteCategoriesSection({
                           sizes="(max-width: 768px) 100vw, 25vw"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                          No cover image
+                        <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+                          {getPublicSiteMessage(language, "common.noCoverImage")}
                         </div>
                       )}
                     </div>
@@ -68,17 +73,17 @@ export function SiteCategoriesSection({
                         <CardTitle className="text-base">{category.name}</CardTitle>
                         {category.seoScore !== null && scoreColors ? (
                           <Badge variant="outline" className={cn("shrink-0", scoreColors.text)}>
-                            SEO {category.seoScore}
+                            {getPublicSiteMessage(language, "common.seo")} {category.seoScore}
                           </Badge>
                         ) : null}
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {category.productCount} product{category.productCount === 1 ? "" : "s"}
+                      <p className="text-muted-foreground text-sm">
+                        {formatProductCount(language, category.productCount)}
                       </p>
                     </CardHeader>
                     {category.description ? (
                       <CardContent>
-                        <p className="line-clamp-3 text-sm text-muted-foreground">
+                        <p className="text-muted-foreground line-clamp-3 text-sm">
                           {category.description}
                         </p>
                       </CardContent>

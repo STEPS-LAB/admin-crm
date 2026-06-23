@@ -1,13 +1,13 @@
-export const PUBLIC_SITE_SECTIONS = [
-  { id: "hero", label: "Home" },
-  { id: "products", label: "Products" },
-  { id: "categories", label: "Categories" },
-  { id: "seo", label: "SEO" },
-  { id: "about", label: "About" },
-  { id: "contact", label: "Contact" },
+export const PUBLIC_SITE_SECTION_IDS = [
+  "hero",
+  "products",
+  "categories",
+  "seo",
+  "about",
+  "contact",
 ] as const;
 
-export type PublicSiteSectionId = (typeof PUBLIC_SITE_SECTIONS)[number]["id"];
+export type PublicSiteSectionId = (typeof PUBLIC_SITE_SECTION_IDS)[number];
 
 export const PUBLIC_SITE_PRODUCT_LIMIT = 8;
 export const PUBLIC_SITE_CATEGORY_LIMIT = 8;
