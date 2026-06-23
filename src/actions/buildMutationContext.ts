@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 
 import { extractRequestMetadata } from "@/lib/security/requestMetadata";
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 
 import type { HistoryMutationContext } from "@/services/historyService";
 

@@ -4,7 +4,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AUTH_ROUTES } from "@/constants/auth";
-import { getAuthenticatedUser, signOut } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
+import { signOut } from "@/services/authenticationService";
 import { extractRequestMetadata } from "@/lib/security/requestMetadata";
 import { clearAdminSessionCookies } from "@/lib/security/sessionCookies";
 

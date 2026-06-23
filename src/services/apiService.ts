@@ -8,7 +8,7 @@ import {
 } from "@/repositories/apiKeyRepository";
 import { findSettings } from "@/repositories/settingsRepository";
 import { countWebhookEndpoints } from "@/repositories/webhookRepository";
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 import { recordEntityCreate, recordEntityUpdate } from "@/services/historyService";
 
 import type { AuthUser } from "@/types/auth";

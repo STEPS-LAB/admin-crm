@@ -7,7 +7,7 @@ import {
   findFeatureFlagInstallations,
   upsertFeatureFlagInstallation,
 } from "@/repositories/featureFlagRepository";
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 import { recordEntityUpdate, type HistoryMutationContext } from "@/services/historyService";
 
 import type { AuthUser } from "@/types/auth";

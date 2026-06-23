@@ -1,13 +1,10 @@
 import { RESTORE_SCOPE_LABELS, type RestoreScope } from "@/constants/backup";
 import { loadBackupArchive, createBackup } from "@/services/backupService";
 import { applyRestoreScopes, previewRestoreScopes } from "@/repositories/restoreRepository";
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 import { createNotification } from "@/services/notificationService";
 
-import type {
-  RestoreExecutionResult,
-  RestorePreviewResult,
-} from "@/types/backup";
+import type { RestoreExecutionResult, RestorePreviewResult } from "@/types/backup";
 import type { HistoryMutationContext } from "@/services/historyService";
 
 export async function previewRestore(

@@ -1,5 +1,4 @@
 import { revalidateTag, unstable_cache } from "next/cache";
-import { cache } from "react";
 
 import { SETTINGS_DATA_CACHE_SECONDS, SETTINGS_DATA_CACHE_TAG } from "@/constants/cache";
 import { collectChangedFields, pickFields } from "@/lib/history/changeTracking";
@@ -187,10 +186,8 @@ const getSettingsCachedAcrossRequests = unstable_cache(
   },
 );
 
-const getSettingsPerRequest = cache(getSettingsCachedAcrossRequests);
-
 async function requireSettings(): Promise<SettingsRecord> {
-  return getSettingsPerRequest();
+  return getSettingsCachedAcrossRequests();
 }
 
 function invalidateSettingsCache(): void {

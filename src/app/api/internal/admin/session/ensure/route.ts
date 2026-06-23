@@ -3,15 +3,9 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { AUTH_ROUTES } from "@/constants/auth";
 import { extractRequestMetadata } from "@/lib/security/requestMetadata";
-import {
-  readAdminSessionCookies,
-  setAdminSessionCookies,
-} from "@/lib/security/sessionCookies";
-import { getAuthenticatedUser } from "@/services/authenticationService";
-import {
-  establishAdminSession,
-  validateAdminSession,
-} from "@/services/sessionService";
+import { readAdminSessionCookies, setAdminSessionCookies } from "@/lib/security/sessionCookies";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
+import { establishAdminSession, validateAdminSession } from "@/services/sessionService";
 
 function resolveRedirectTarget(request: NextRequest): string {
   const redirectParam = request.nextUrl.searchParams.get("redirect");

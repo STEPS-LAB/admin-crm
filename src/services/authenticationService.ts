@@ -1,12 +1,10 @@
-import { cache } from "react";
-
-import {
-  checkRateLimit,
-  clearRateLimit,
-  recordFailedAttempt,
-} from "@/lib/security/rateLimiter";
+import { checkRateLimit, clearRateLimit, recordFailedAttempt } from "@/lib/security/rateLimiter";
 import { isIpAllowed, resolveLoginRateLimitPolicy } from "@/lib/security/securityPolicy";
-import { findProfileByEmail, findProfileById, upsertProfile } from "@/repositories/profileRepository";
+import {
+  findProfileByEmail,
+  findProfileById,
+  upsertProfile,
+} from "@/repositories/profileRepository";
 import { createClient } from "@/lib/supabase/server";
 import { logAuthEvent } from "@/services/auditService";
 import { getSettings } from "@/services/settingsService";
@@ -53,11 +51,7 @@ export async function authenticate(
   const loginPolicy = resolveLoginRateLimitPolicy(settings);
 
   if (loginPolicy.enabled) {
-    const rateCheck = checkRateLimit(
-      rateLimitKey,
-      loginPolicy.maxAttempts,
-      loginPolicy.windowMs,
-    );
+    const rateCheck = checkRateLimit(rateLimitKey, loginPolicy.maxAttempts, loginPolicy.windowMs);
 
     if (!rateCheck.allowed) {
       return {
@@ -125,7 +119,9 @@ export async function authenticate(
   const displayName =
     (typeof data.user.user_metadata?.display_name === "string"
       ? data.user.user_metadata.display_name
-      : null) ?? data.user.email.split("@")[0] ?? "Administrator";
+      : null) ??
+    data.user.email.split("@")[0] ??
+    "Administrator";
 
   const user = await upsertProfile({
     id: data.user.id,
@@ -176,7 +172,7 @@ export async function signOut(profileId: string | null, metadata: RequestMetadat
   }
 }
 
-export const getAuthenticatedUser = cache(async (): Promise<AuthUser | null> => {
+export async function resolveAuthenticatedUser(): Promise<AuthUser | null> {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
 
@@ -205,7 +201,9 @@ export const getAuthenticatedUser = cache(async (): Promise<AuthUser | null> => 
   const displayName =
     (typeof data.user.user_metadata?.display_name === "string"
       ? data.user.user_metadata.display_name
-      : null) ?? data.user.email.split("@")[0] ?? "Administrator";
+      : null) ??
+    data.user.email.split("@")[0] ??
+    "Administrator";
 
   return upsertProfile({
     id: data.user.id,
@@ -216,4 +214,4 @@ export const getAuthenticatedUser = cache(async (): Promise<AuthUser | null> => 
         ? data.user.user_metadata.avatar_url
         : null,
   });
-});
+}

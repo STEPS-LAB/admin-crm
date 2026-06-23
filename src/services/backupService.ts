@@ -1,4 +1,9 @@
-import { BACKUP_MAX_ARCHIVE_BYTES, BACKUP_STORAGE_BUCKET, type BackupTrigger, type BackupType } from "@/constants/backup";
+import {
+  BACKUP_MAX_ARCHIVE_BYTES,
+  BACKUP_STORAGE_BUCKET,
+  type BackupTrigger,
+  type BackupType,
+} from "@/constants/backup";
 import {
   parseBackupArchive,
   serializeBackupSnapshot,
@@ -20,12 +25,8 @@ import {
 } from "@/repositories/backupRepository";
 import { collectBackupSnapshot } from "@/repositories/backupSnapshotRepository";
 import { findSettings } from "@/repositories/settingsRepository";
-import {
-  downloadObject,
-  removeObject,
-  uploadObject,
-} from "@/repositories/storageRepository";
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { downloadObject, removeObject, uploadObject } from "@/repositories/storageRepository";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 import { createNotification } from "@/services/notificationService";
 import { emitWebhookEvent } from "@/services/webhookService";
 
@@ -209,10 +210,7 @@ export async function createBackup(input: {
 
     return mapBackupSummary(completed);
   } catch (error) {
-    await failBackupRecord(
-      created.id,
-      error instanceof Error ? error.message : "Backup failed",
-    );
+    await failBackupRecord(created.id, error instanceof Error ? error.message : "Backup failed");
 
     if (input.triggeredBy !== "pre_restore") {
       const profileId = input.context.profileId ?? user?.id ?? null;
@@ -353,7 +351,10 @@ export async function protectBackup(backupId: string, isProtected: boolean): Pro
   await setBackupProtection(backupId, isProtected);
 }
 
-export async function runScheduledBackupIfDue(): Promise<{ readonly ran: boolean; readonly id?: string }> {
+export async function runScheduledBackupIfDue(): Promise<{
+  readonly ran: boolean;
+  readonly id?: string;
+}> {
   const settings = await loadBackupSettings();
 
   if (!settings.backupScheduleEnabled) {

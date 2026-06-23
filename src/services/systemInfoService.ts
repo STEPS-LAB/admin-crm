@@ -1,5 +1,5 @@
 import { getSystemInfoSnapshot } from "@/lib/system/systemInfo";
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 
 import type { AuthUser } from "@/types/auth";
 import type { SystemInfoSnapshot } from "@/types/system-info";

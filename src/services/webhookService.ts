@@ -24,7 +24,7 @@ import {
   updateWebhookEndpointStatus,
 } from "@/repositories/webhookRepository";
 import { findSettings } from "@/repositories/settingsRepository";
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 
 import type { AuthUser } from "@/types/auth";
 import type {
@@ -96,9 +96,7 @@ export async function listWebhookDeliveries(limit = 20): Promise<WebhookDelivery
   return findWebhookDeliveries(user.id, limit);
 }
 
-export async function getWebhookDeliveryDetail(
-  deliveryId: string,
-): Promise<WebhookDeliveryDetail> {
+export async function getWebhookDeliveryDetail(deliveryId: string): Promise<WebhookDeliveryDetail> {
   const user = await requireAuthenticatedUser();
   const delivery = await findWebhookDeliveryDetail(user.id, deliveryId);
 

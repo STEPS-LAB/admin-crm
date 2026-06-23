@@ -1,11 +1,9 @@
 "use server";
 
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 import { enforceServerActionRateLimit } from "@/lib/security/serverActionRateLimit";
 
-export async function enforceListSearchRateLimit(
-  search: string | undefined | null,
-): Promise<void> {
+export async function enforceListSearchRateLimit(search: string | undefined | null): Promise<void> {
   if (!search?.trim()) {
     return;
   }

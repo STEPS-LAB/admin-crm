@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 import { updateUserLocale } from "@/services/userProfileService";
 import { ADMIN_LOCALES } from "@/types/admin-locale";
 

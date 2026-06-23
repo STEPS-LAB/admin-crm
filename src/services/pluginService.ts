@@ -1,13 +1,10 @@
-import {
-  BUNDLED_PLUGINS,
-  type BundledPluginDefinition,
-} from "@/constants/plugins";
+import { BUNDLED_PLUGINS, type BundledPluginDefinition } from "@/constants/plugins";
 import {
   findPluginInstallationBySlug,
   findPluginInstallations,
   upsertPluginInstallation,
 } from "@/repositories/pluginRepository";
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 import { recordEntityUpdate } from "@/services/historyService";
 
 import type { AuthUser } from "@/types/auth";

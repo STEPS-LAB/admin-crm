@@ -1,4 +1,4 @@
-import { getAuthenticatedUser } from "@/services/authenticationService";
+import { getAuthenticatedUser } from "@/lib/auth/cachedAuthenticatedUser";
 import {
   countCriticalUnreadNotifications,
   countUnreadNotifications,
