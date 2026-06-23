@@ -50,6 +50,7 @@ export function SiteCategoriesSection({
                 <Link
                   key={category.id}
                   href={buildPublicSiteEntityHref("categories", category.slug, language)}
+                  prefetch={false}
                   className="block"
                 >
                   <Card className="hover:bg-accent/20 h-full overflow-hidden transition-colors">

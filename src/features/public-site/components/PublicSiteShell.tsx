@@ -1,4 +1,4 @@
-import { Suspense, cache } from "react";
+import { cache } from "react";
 
 import { MaintenanceNotice } from "@/features/public-site/components/MaintenanceNotice";
 import { SiteFooter } from "@/features/public-site/components/SiteFooter";
@@ -20,14 +20,12 @@ export function PublicSiteShell({
 }: PublicSiteShellProps): React.JSX.Element {
   return (
     <>
-      <Suspense fallback={<div className="bg-muted/30 h-16 border-b" />}>
-        <SiteHeader
-          siteName={context.settings.siteName}
-          language={context.language}
-          supportedLanguages={context.supportedLanguages}
-          languageSwitcherEnabled={context.languageSwitcherEnabled}
-        />
-      </Suspense>
+      <SiteHeader
+        siteName={context.settings.siteName}
+        language={context.language}
+        supportedLanguages={context.supportedLanguages}
+        languageSwitcherEnabled={context.languageSwitcherEnabled}
+      />
       {children}
       <SiteFooter
         siteName={context.settings.siteName}

@@ -13,10 +13,12 @@ export function toPublicSiteLanguage(segment: PublicSiteLanguageSegment): Public
 }
 
 export function replaceLanguageInPathname(
-  pathname: string,
+  pathname: string | null | undefined,
   language: PublicSiteLanguage,
 ): string {
-  const segments = pathname.split("/").filter(Boolean);
+  const safePathname = pathname?.trim() || "/";
+
+  const segments = safePathname.split("/").filter(Boolean);
 
   if (segments.length === 0) {
     return `/${language}`;
@@ -27,7 +29,12 @@ export function replaceLanguageInPathname(
     return `/${segments.join("/")}`;
   }
 
-  return `/${language}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+  return `/${language}${safePathname.startsWith("/") ? safePathname : `/${safePathname}`}`;
+}
+
+export function isPublicSiteHomePath(pathname: string | null | undefined): boolean {
+  const segments = (pathname ?? "").split("/").filter(Boolean);
+  return segments.length === 1 && isPublicSiteLanguageSegment(segments[0]!);
 }
 
 export function resolveLegacySiteLanguage(
@@ -41,8 +48,10 @@ export function resolveLegacySiteLanguage(
   return defaultLanguage;
 }
 
-export function extractLanguageFromPathname(pathname: string): PublicSiteLanguage | null {
-  const segments = pathname.split("/").filter(Boolean);
+export function extractLanguageFromPathname(
+  pathname: string | null | undefined,
+): PublicSiteLanguage | null {
+  const segments = (pathname ?? "").split("/").filter(Boolean);
   const firstSegment = segments[0];
 
   if (!firstSegment || !isPublicSiteLanguageSegment(firstSegment)) {

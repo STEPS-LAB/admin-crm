@@ -58,6 +58,7 @@ export function SiteProductsSection({
                 <Link
                   key={product.id}
                   href={buildPublicSiteEntityHref("products", product.slug, language)}
+                  prefetch={false}
                   className="block"
                 >
                   <Card className="hover:bg-accent/20 h-full overflow-hidden transition-colors">

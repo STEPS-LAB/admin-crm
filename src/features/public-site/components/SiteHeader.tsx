@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { PUBLIC_SITE_LANGUAGE_LABELS } from "@/constants/public-site";
 import { SiteSearchForm } from "@/features/public-site/components/SiteSearchForm";
 import { getPublicSiteMessage, getPublicSiteSections } from "@/lib/public-site/messages";
-import { replaceLanguageInPathname } from "@/lib/public-site/pathLanguage";
+import { isPublicSiteHomePath, replaceLanguageInPathname } from "@/lib/public-site/pathLanguage";
 import { buildPublicSiteHomeHref } from "@/lib/public-site/paths";
 import { cn } from "@/lib/utils/cn";
 
@@ -27,16 +27,20 @@ export function SiteHeader({
   supportedLanguages,
   languageSwitcherEnabled,
 }: SiteHeaderProps): React.JSX.Element {
-  const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const sections = getPublicSiteSections(language);
 
   const switchLanguage = (nextLanguage: PublicSiteLanguage): void => {
+    if (nextLanguage === language || isPending) {
+      return;
+    }
+
     const nextPath = replaceLanguageInPathname(pathname, nextLanguage);
+    const destination = isPublicSiteHomePath(pathname) ? `${nextPath}#hero` : nextPath;
 
     startTransition(() => {
-      router.replace(`${nextPath}#hero`);
+      window.location.assign(destination);
     });
   };
 
@@ -66,7 +70,7 @@ export function SiteHeader({
         </nav>
 
         <div className="hidden lg:block">
-          <SiteSearchForm language={language} />
+          <SiteSearchForm key={language} language={language} />
         </div>
 
         <div className="ml-auto flex items-center gap-2">
@@ -97,7 +101,9 @@ export function SiteHeader({
           ) : null}
 
           <Button variant="outline" size="sm" asChild>
-            <Link href="/admin">{getPublicSiteMessage(language, "common.admin")}</Link>
+            <Link href="/admin" prefetch={false}>
+              {getPublicSiteMessage(language, "common.admin")}
+            </Link>
           </Button>
         </div>
       </div>

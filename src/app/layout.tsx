@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { DeploymentRecovery } from "@/providers/DeploymentRecovery";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import "@/styles/globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({
     <html lang="uk" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider>
+          <DeploymentRecovery />
           <TooltipProvider delayDuration={300}>
             {children}
             <Toaster richColors closeButton position="top-right" />
