@@ -34,23 +34,25 @@ function countJsonArrayItems(
 
 export async function getPublicSiteSeoOverview(): Promise<SeoCenterOverview> {
   return withDbRetry(async (db) => {
-    const [analysisRows, redirectCount, schemaCount, profileCount] = await Promise.all([
-      db
-        .select({
-          ownerType: seoProfiles.ownerType,
-          overallScore: seoAnalysis.overallScore,
-          errors: seoAnalysis.errors,
-          warnings: seoAnalysis.warnings,
-          recommendations: seoAnalysis.recommendations,
-          lastScanAt: seoAnalysis.lastScanAt,
-        })
-        .from(seoProfiles)
-        .leftJoin(seoAnalysis, eq(seoAnalysis.seoProfileId, seoProfiles.id))
-        .where(isNull(seoProfiles.deletedAt)),
-      db.select({ value: count() }).from(redirectRules),
-      db.select({ value: count() }).from(schemaDocuments),
-      db.select({ value: count() }).from(seoProfiles).where(isNull(seoProfiles.deletedAt)),
-    ]);
+    const analysisRows = await db
+      .select({
+        ownerType: seoProfiles.ownerType,
+        overallScore: seoAnalysis.overallScore,
+        errors: seoAnalysis.errors,
+        warnings: seoAnalysis.warnings,
+        recommendations: seoAnalysis.recommendations,
+        lastScanAt: seoAnalysis.lastScanAt,
+      })
+      .from(seoProfiles)
+      .leftJoin(seoAnalysis, eq(seoAnalysis.seoProfileId, seoProfiles.id))
+      .where(isNull(seoProfiles.deletedAt));
+
+    const redirectCount = await db.select({ value: count() }).from(redirectRules);
+    const schemaCount = await db.select({ value: count() }).from(schemaDocuments);
+    const profileCount = await db
+      .select({ value: count() })
+      .from(seoProfiles)
+      .where(isNull(seoProfiles.deletedAt));
 
     const grouped = new Map<SeoOwnerType, number[]>();
 

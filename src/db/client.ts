@@ -28,13 +28,17 @@ const globalForDb = globalThis as unknown as {
   dbInstance: ReturnType<typeof drizzle<typeof schema>> | undefined;
 };
 
+function resolveConnectTimeout(): number {
+  return process.env.VERCEL === "1" ? 8 : 30;
+}
+
 function createQueryClient(): ReturnType<typeof postgres> {
   const { DATABASE_URL } = getServerEnv();
 
   return postgres(DATABASE_URL, {
     max: resolvePoolSize(),
     idle_timeout: 20,
-    connect_timeout: 30,
+    connect_timeout: resolveConnectTimeout(),
     max_lifetime: 60 * 10,
     prepare: false,
   });

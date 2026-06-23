@@ -12,11 +12,12 @@ import {
   PublicSiteShell,
   loadPublicSitePageContext,
 } from "@/features/public-site/components/PublicSiteShell";
+import { getCachedPublicSitePageData } from "@/lib/public-site/cachedPublicPageData";
 import { getCachedPublicHomepageSeo } from "@/lib/public-site/cachedPublicSeo";
-import { getPublicSitePageData } from "@/services/publicSiteService";
 import { buildMaintenanceMetadata } from "@/services/publicSeoService";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 interface PublicSiteHomePageProps {
   readonly params: Promise<{ lang: string }>;
@@ -48,7 +49,7 @@ export default async function PublicSiteHomePage({
   }
 
   const [data, seo] = await Promise.all([
-    getPublicSitePageData(pageState.context.language, pageState.context.settings),
+    getCachedPublicSitePageData(pageState.context.language),
     getCachedPublicHomepageSeo(pageState.context),
   ]);
 

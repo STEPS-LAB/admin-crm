@@ -63,10 +63,8 @@ export async function getPublicSitePageData(
   const homepage = await findPublishedHomepageContent(language);
   const products = await findPublishedProductCards(language, PUBLIC_SITE_PRODUCT_LIMIT);
   const categories = await findPublishedCategoryCards(language, PUBLIC_SITE_CATEGORY_LIMIT);
-  const [seoOverview, catalogStats] = await Promise.all([
-    getPublicSiteSeoOverview(),
-    findPublicCatalogStats(),
-  ]);
+  const catalogStats = await findPublicCatalogStats();
+  const seoOverview = await getPublicSiteSeoOverview();
 
   return {
     language,

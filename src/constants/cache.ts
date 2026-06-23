@@ -34,3 +34,8 @@ export const SETTINGS_DATA_CACHE_TAG = "settings" as const;
 
 /** Cross-request settings cache TTL for admin shell and security checks. */
 export const SETTINGS_DATA_CACHE_SECONDS = 60;
+
+export const PUBLIC_SITE_CACHE_TAG = "public-site" as const;
+
+/** Cross-request cache TTL for public storefront pages. */
+export const PUBLIC_SITE_PAGE_CACHE_SECONDS = 120;
