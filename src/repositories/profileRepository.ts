@@ -81,6 +81,22 @@ export async function updateLastLogin(profileId: string): Promise<void> {
     .where(eq(profiles.id, profileId));
 }
 
+export async function updateProfileLocale(profileId: string, locale: string): Promise<AuthUser | null> {
+  const db = getDb();
+
+  const [updated] = await db
+    .update(profiles)
+    .set({ locale, updatedAt: new Date() })
+    .where(eq(profiles.id, profileId))
+    .returning();
+
+  if (!updated) {
+    return null;
+  }
+
+  return mapProfileToAuthUser(updated);
+}
+
 function mapProfileToAuthUser(row: typeof profiles.$inferSelect): AuthUser {
   return {
     id: row.id,

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { loginAction } from "@/actions/authentication/login";
@@ -24,6 +24,7 @@ export function LoginForm(): React.JSX.Element {
   const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
+  const [, startTransition] = useTransition();
 
   const {
     register,
@@ -74,7 +75,9 @@ export function LoginForm(): React.JSX.Element {
     if (data.rememberMe) {
       formData.set("rememberMe", "true");
     }
-    formAction(formData);
+    startTransition(() => {
+      formAction(formData);
+    });
   });
 
   return (

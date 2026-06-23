@@ -1,4 +1,5 @@
 export { AdminHeader } from "./AdminHeader";
+export { AdminLanguageToggle } from "./AdminLanguageToggle";
 export { AdminShell } from "./AdminShell";
 export { AdminSidebar, MobileSidebar, SidebarNav } from "./AdminSidebar";
 export { ModulePlaceholder } from "./ModulePlaceholder";

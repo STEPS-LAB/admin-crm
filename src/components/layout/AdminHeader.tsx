@@ -2,13 +2,15 @@
 
 import { Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils/cn";
-
+import { AdminLanguageToggle } from "./AdminLanguageToggle";
 import { ThemeToggle } from "./ThemeToggle";
 import { NotificationBellLive } from "./NotificationBellLive";
 import { useSidebar } from "./SidebarProvider";
 import { UserMenu } from "./UserMenu";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils/cn";
+import { useAdminLocale } from "@/providers/AdminLocaleProvider";
 
 import type { AuthUser } from "@/types/auth";
 
@@ -22,6 +24,7 @@ export function AdminHeader({
   className,
 }: AdminHeaderProps): React.JSX.Element {
   const { collapsed, toggleCollapsed, setMobileOpen } = useSidebar();
+  const { t } = useAdminLocale();
 
   return (
     <header
@@ -35,7 +38,7 @@ export function AdminHeader({
         size="icon"
         className="md:hidden"
         onClick={() => setMobileOpen(true)}
-        aria-label="Open navigation menu"
+        aria-label={t("header.openNavigation")}
       >
         <Menu className="h-5 w-5" />
       </Button>
@@ -45,15 +48,16 @@ export function AdminHeader({
         size="icon"
         className="hidden md:inline-flex"
         onClick={toggleCollapsed}
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        aria-label={collapsed ? t("header.expandSidebar") : t("header.collapseSidebar")}
       >
         {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
       </Button>
 
       <div className="flex-1" />
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <NotificationBellLive userId={user.id} />
+        <AdminLanguageToggle />
         <ThemeToggle />
         <UserMenu user={user} />
       </div>

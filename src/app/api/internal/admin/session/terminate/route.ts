@@ -6,7 +6,7 @@ import { extractRequestMetadata } from "@/lib/security/requestMetadata";
 import { clearAdminSessionCookies } from "@/lib/security/sessionCookies";
 import { getAuthenticatedUser, signOut } from "@/services/authenticationService";
 
-const ALLOWED_TERMINATION_REASONS = new Set(["session_expired", "ip_blocked"]);
+const ALLOWED_TERMINATION_REASONS = new Set(["session_expired", "ip_blocked", "logout"]);
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const reasonParam = request.nextUrl.searchParams.get("reason") ?? "session_expired";
@@ -25,7 +25,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   const loginUrl = new URL(AUTH_ROUTES.login, request.url);
-  loginUrl.searchParams.set("error", reason);
+
+  if (reason !== "logout") {
+    loginUrl.searchParams.set("error", reason);
+  }
 
   return NextResponse.redirect(loginUrl);
 }

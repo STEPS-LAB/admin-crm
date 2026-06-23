@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { LogOut, User } from "lucide-react";
 
-import { logoutAction } from "@/actions/authentication/logout";
+import { ADMIN_SESSION_TERMINATE_PATH } from "@/constants/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAdminLocale } from "@/providers/AdminLocaleProvider";
 
 import type { AuthUser } from "@/types/auth";
 
@@ -30,10 +32,12 @@ export interface UserMenuProps {
 }
 
 export function UserMenu({ user }: UserMenuProps): React.JSX.Element {
+  const { t } = useAdminLocale();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full" aria-label="User menu">
+        <Button variant="ghost" className="relative h-9 w-9 rounded-full" aria-label={t("header.userMenu")}>
           <Avatar className="h-9 w-9">
             {user.avatarUrl ? <AvatarImage src={user.avatarUrl} alt={user.displayName} /> : null}
             <AvatarFallback className="text-xs">{getInitials(user.displayName)}</AvatarFallback>
@@ -50,16 +54,17 @@ export function UserMenu({ user }: UserMenuProps): React.JSX.Element {
         <DropdownMenuSeparator />
         <DropdownMenuItem disabled>
           <User className="mr-2 h-4 w-4" />
-          Profile
+          {t("header.profile")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <form action={logoutAction} className="w-full">
-            <button type="submit" className="flex w-full items-center">
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
-            </button>
-          </form>
+          <Link
+            href={`${ADMIN_SESSION_TERMINATE_PATH}?reason=logout`}
+            className="flex w-full cursor-pointer items-center"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            {t("header.signOut")}
+          </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
